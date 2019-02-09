@@ -6,6 +6,9 @@ import {SharedModule} from './shared/shared.module';
 import {environment} from '../environments/environment';
 import {CommonModule} from '@angular/common';
 import {ReactiveFormsModule} from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {MatButtonModule, MatCardModule, MatIconModule} from '@angular/material';
+import {FlexLayoutModule} from '@angular/flex-layout';
 
 @NgModule({
   declarations: [
@@ -15,7 +18,12 @@ import {ReactiveFormsModule} from '@angular/forms';
     BrowserModule,
     CommonModule,
     ReactiveFormsModule,
-    SharedModule.forRoot({baseSearchAPI: environment.baseSearchAPI})
+    FlexLayoutModule,
+    SharedModule.forRoot({baseSearchAPI: environment.baseSearchAPI}),
+    BrowserAnimationsModule,
+    MatCardModule,
+    MatIconModule,
+    MatButtonModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,0 +1,31 @@
+.search-page {
+  max-width: 800px;
+  margin: auto;
+}
+
+.search-page .cards mat-card {
+  margin-top: 20px;
+}
+
+.search-page .paging button {
+  pointer-events: none;
+  opacity: .5;
+}
+
+.search-page .paging button.enabled {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.search-page .total {
+  font-weight: bold;
+  padding-top: 8px;
+}
+
+input.search {
+  margin: 20px 0;
+}
+
+.gh-profile {
+  max-width: 300px;
+}
