@@ -7,11 +7,20 @@ import {isEmptyString} from './shared/misc/pure';
 import {untilDestroyed} from 'ngx-take-until-destroy';
 import {Subject} from 'rxjs';
 import {Rel, SearchResult, UrlToRel} from './shared/model/model';
+import {animate, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: '0' }),
+        animate('.5s ease-out', style({ opacity: '1' })),
+      ]),
+    ]),
+  ],
 })
 export class AppComponent implements OnInit, OnDestroy {
   private searchField: FormControl;

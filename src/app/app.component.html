@@ -2,13 +2,16 @@
   <input class="search" fxFlex="1 1 auto" type="text" [formControl]="searchField" placeholder="Search...">
   <div fxFlex="1 0 70%" fxLayoutGap="5px" fxLayout="column" class="resultsContainer"
        *ngIf="res$ | async as searchResult">
-    <div class="paging" *ngIf="searchResult.pagination as paging" fxLayout="row" fxLayoutGap="10px">
+    <div class="paging" *ngIf="searchResult.pagination.links as paging" fxLayout="row" fxLayoutGap="10px">
 
       <button mat-button (click)="update(paging, 'first')" [ngClass]="{enabled: isAvailable(paging, 'first')}">
         <mat-icon>first_page</mat-icon>
       </button>
       <button mat-button (click)="update(paging, 'prev')" [ngClass]="{enabled: isAvailable(paging, 'prev')}">Prev
       </button>
+
+      <div class="total">{{searchResult.pagination.currentPage}}</div>
+
       <button mat-button (click)="update(paging, 'next')" [ngClass]="{enabled: isAvailable(paging, 'next')}">Next
       </button>
 
@@ -18,7 +21,7 @@
       <div class="total">Total: {{searchResult?.total_count}}</div>
     </div>
     <div class="cards" fxLayout="row wrap" fxLayoutAlign="space-between">
-      <mat-card *ngFor="let item of searchResult.items" class="gh-profile">
+      <mat-card *ngFor="let item of searchResult.items" class="gh-profile" @fadeIn>
         <mat-card-header>
           <img mat-card-avatar src="{{item.avatar_url}}"/>
           <mat-card-title>{{item.login}}</mat-card-title>

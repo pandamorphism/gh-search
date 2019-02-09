@@ -29,9 +29,28 @@ const parseUrlAndRel: (str: string) => Option<UrlToRel> = str =>
       rel: extractRel(REL).getOrElse(null)
     }) : none);
 
-export const parseLinks: (links: string) => UrlToRel[] = links =>
+const currentPageFromLinks: (urls: UrlToRel[]) => { links: UrlToRel[], currentPage: number } = links => {
+  const nextPage = fromNullable(links.find(link => link.rel === 'next'))
+    .map(link => link.url.match(/page+=\s*(.*)/))
+    .filter(matched => matched && matched.length >= 2)
+    .map(matched => parseInt(matched[1], 0));
+  const prevPage = fromNullable(links.find(link => link.rel === 'prev'))
+    .map(link => link.url.match(/page+=\s*(.*)/))
+    .filter(matched => matched && matched.length >= 2)
+    .map(matched => parseInt(matched[1], 0));
+  const currentPage = Math.max(0, nextPage.isSome() ? nextPage.getOrElse(0) - 1 :
+    prevPage.getOrElse(0) + 1);
+  return ({links, currentPage});
+};
+
+
+const parseLinks: (links: string) => UrlToRel[] = links =>
   fromNullable(links)
     .map(linksStr => linksStr.split(','))
     .getOrElse([])
     .map(parseUrlAndRel)
     .reduce((rels, current) => [...rels, current.getOrElse(null)], []).filter(notNull);
+
+
+export const linksNPage: (links: string) => { links: UrlToRel[], currentPage: number } = compose(currentPageFromLinks, parseLinks);
+

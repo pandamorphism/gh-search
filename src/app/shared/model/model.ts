@@ -2,7 +2,11 @@ export type SearchResult = {
   incomplete_results: boolean
   items: UserInfo[];
   total_count: number;
-  pagination: UrlToRel[];
+  currentPage: number;
+  pagination: {
+    links: UrlToRel[],
+    currentPage: number
+  };
 };
 
 export type UserInfo = {

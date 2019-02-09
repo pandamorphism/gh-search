@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {map, tap} from 'rxjs/operators';
 import {Observable} from 'rxjs';
 import {SearchResult} from './model/model';
-import {parseLinks} from './misc/pure';
+import {linksNPage, parseLinks} from './misc/pure';
 
 export const searchUsersAPI: InjectionToken<string> = new InjectionToken('searchUsersAPI');
 
@@ -17,14 +17,14 @@ export class SearchService {
 
   search$(q: string): Observable<SearchResult> {
     return this.http.get<SearchResult>(this.searchUsersEndpoint, {params: {q}, observe: 'response'}).pipe(
-      map(res => ({...res.body, pagination: parseLinks(res.headers.get('Link'))})),
+      map(res => ({...res.body, pagination: linksNPage(res.headers.get('Link'))})),
       tap(result => console.log('res : %O', result))
     );
   }
 
   searchDirect$(url): Observable<SearchResult> {
     return this.http.get<SearchResult>(url, {observe: 'response'}).pipe(
-      map(res => ({...res.body, pagination: parseLinks(res.headers.get('Link'))})),
+      map(res => ({...res.body, pagination: linksNPage(res.headers.get('Link'))})),
       tap(result => console.log('res : %O', result))
     );
   }
