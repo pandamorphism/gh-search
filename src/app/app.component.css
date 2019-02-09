@@ -3,8 +3,31 @@
   margin: auto;
 }
 
+.search-page .title {
+  font-size: 35px;
+  color: #FFFFFF;
+  background: #FFFFFF;
+  text-shadow: 1px 3px 0 #969696, 1px 5px 5px rgba(114, 123, 224, 1);
+}
+
 .search-page .cards mat-card {
   margin-top: 20px;
+  width: 100%;
+}
+
+.search-page .cards mat-card.pending {
+  pointer-events: none;
+  opacity: .5;
+}
+
+.search-page .cards mat-card.detailed {
+  box-shadow: 0px 4px 71px -1px rgba(114, 123, 224, 1);
+}
+
+.search-page .cards mat-card .spinner {
+  position: absolute;
+  left: 145px;
+  bottom: 35px;
 }
 
 .search-page .paging button {
@@ -12,9 +35,21 @@
   opacity: .5;
 }
 
+.detailed span {
+  display: inline-block;
+  position: relative;
+  bottom: 6px;
+  left: 5px;
+}
+
 .search-page .paging button.enabled {
   pointer-events: auto;
   opacity: 1;
+}
+
+.search-page button.refresh {
+  width: 30px;
+  margin-left: auto;
 }
 
 .search-page .total {

@@ -1,13 +1,15 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {SearchService} from './shared/search.service';
 import {FormControl} from '@angular/forms';
-import {debounceTime, switchMap, take, tap} from 'rxjs/operators';
+import {catchError, debounceTime, finalize, switchMap, take, tap} from 'rxjs/operators';
 import {separate} from 'rxjs-etc';
 import {isEmptyString} from './shared/misc/pure';
 import {untilDestroyed} from 'ngx-take-until-destroy';
-import {Subject} from 'rxjs';
-import {Rel, SearchResult, UrlToRel} from './shared/model/model';
+import {Subject, throwError} from 'rxjs';
+import {Rel, SearchResult, UrlToRel, UserDetails, UserInfo} from './shared/model/model';
 import {animate, style, transition, trigger} from '@angular/animations';
+import {MatIconRegistry} from '@angular/material';
+import {DomSanitizer} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
@@ -16,8 +18,8 @@ import {animate, style, transition, trigger} from '@angular/animations';
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
-        style({ opacity: '0' }),
-        animate('.5s ease-out', style({ opacity: '1' })),
+        style({opacity: '0'}),
+        animate('.5s ease-out', style({opacity: '1'})),
       ]),
     ]),
   ],
@@ -25,8 +27,16 @@ import {animate, style, transition, trigger} from '@angular/animations';
 export class AppComponent implements OnInit, OnDestroy {
   private searchField: FormControl;
   private res$: Subject<SearchResult | null> = new Subject();
+  private pendingDetailsProfileIds: number[] = [];
+  private userDetails: { [id: number]: UserDetails } = {};
 
-  constructor(private searchService: SearchService) {
+  constructor(private searchService: SearchService,
+              private domSanitizer: DomSanitizer,
+              private matIconRegistry: MatIconRegistry) {
+    this.matIconRegistry.addSvgIcon(
+      'github',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('../assets/gh.svg')
+    );
   }
 
   ngOnInit(): void {
@@ -55,6 +65,23 @@ export class AppComponent implements OnInit, OnDestroy {
   update(paging: UrlToRel[], rel: Rel) {
     this.searchService.searchDirect$(paging.find(page => page.rel === rel).url)
       .pipe(tap(response => this.res$.next(response)), take(1))
+      .subscribe();
+  }
+
+  navigate(url: string) {
+    window.open(url, '_blank');
+  }
+
+  getDetails(item: UserInfo) {
+    this.pendingDetailsProfileIds = [...this.pendingDetailsProfileIds, item.id];
+    this.searchService.getDetails$(item).pipe(
+      tap(details => this.userDetails[item.id] = details),
+      catchError(err => {
+        console.error(err);
+        return throwError(err);
+      }),
+      finalize(
+        () => this.pendingDetailsProfileIds = this.pendingDetailsProfileIds.filter(id => id !== item.id)))
       .subscribe();
   }
 }

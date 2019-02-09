@@ -34,12 +34,12 @@ const currentPageFromLinks: (urls: UrlToRel[]) => { links: UrlToRel[], currentPa
     .map(link => link.url.match(/page+=\s*(.*)/))
     .filter(matched => matched && matched.length >= 2)
     .map(matched => parseInt(matched[1], 0));
-  const prevPage = fromNullable(links.find(link => link.rel === 'prev'))
+  const prevPage = () => fromNullable(links.find(link => link.rel === 'prev'))
     .map(link => link.url.match(/page+=\s*(.*)/))
     .filter(matched => matched && matched.length >= 2)
     .map(matched => parseInt(matched[1], 0));
   const currentPage = Math.max(0, nextPage.isSome() ? nextPage.getOrElse(0) - 1 :
-    prevPage.getOrElse(0) + 1);
+    prevPage().getOrElse(0) + 1);
   return ({links, currentPage});
 };
 

@@ -2,8 +2,8 @@ import {Inject, Injectable, InjectionToken} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {map, tap} from 'rxjs/operators';
 import {Observable} from 'rxjs';
-import {SearchResult} from './model/model';
-import {linksNPage, parseLinks} from './misc/pure';
+import {SearchResult, UserDetails, UserInfo} from './model/model';
+import {linksNPage} from './misc/pure';
 
 export const searchUsersAPI: InjectionToken<string> = new InjectionToken('searchUsersAPI');
 
@@ -27,5 +27,9 @@ export class SearchService {
       map(res => ({...res.body, pagination: linksNPage(res.headers.get('Link'))})),
       tap(result => console.log('res : %O', result))
     );
+  }
+
+  getDetails$(item: UserInfo): Observable<UserDetails> {
+    return this.http.get<UserDetails>(item.url).pipe(tap(result => console.log('details : %O', result)));
   }
 }
