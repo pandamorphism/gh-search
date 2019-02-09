@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {SearchService} from './shared/search.service';
 import {FormControl} from '@angular/forms';
-import {catchError, debounceTime, finalize, switchMap, take, tap} from 'rxjs/operators';
+import {catchError, debounceTime, finalize, map, switchMap, take, tap} from 'rxjs/operators';
 import {separate} from 'rxjs-etc';
 import {isEmptyString} from './shared/misc/pure';
 import {untilDestroyed} from 'ngx-take-until-destroy';
@@ -42,7 +42,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.searchField = new FormControl('');
-    const [cleanUp$, search$] = separate(this.searchField.valueChanges.pipe(debounceTime(300)), isEmptyString);
+    const [cleanUp$, search$] = separate(this.searchField.valueChanges.pipe(debounceTime(300), map(str => str.trim())), isEmptyString);
 
     cleanUp$.pipe(
       tap(_ => this.res$.next(null)),
