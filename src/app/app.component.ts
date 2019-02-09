@@ -75,7 +75,17 @@ export class AppComponent implements OnInit, OnDestroy {
 
   update(paging: UrlToRel[], rel: Rel) {
     this.searchService.searchDirect$(paging.find(page => page.rel === rel).url)
-      .pipe(tap(response => this.res$.next(response)), take(1))
+      .pipe(tap(response => this.res$.next(response)),
+        catchError(err => {
+          this.snackBar.open(err.error.message, '', {
+            duration: 2000,
+            panelClass: 'error',
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+          return throwError(err);
+        }),
+        take(1))
       .subscribe();
   }
 
@@ -88,7 +98,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.searchService.getDetails$(item).pipe(
       tap(details => this.userDetails[item.id] = details),
       catchError(err => {
-        this.snackBar.open(err.message, '', {
+        this.snackBar.open(err.error.message, '', {
           duration: 2000,
           panelClass: 'error',
           horizontalPosition: 'center',
