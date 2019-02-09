@@ -25,8 +25,8 @@ import {DomSanitizer} from '@angular/platform-browser';
   ],
 })
 export class AppComponent implements OnInit, OnDestroy {
-  private searchField: FormControl;
-  private res$: Subject<SearchResult | null> = new Subject();
+  searchField: FormControl;
+  res$: Subject<SearchResult | null> = new Subject();
   private pendingDetailsProfileIds: number[] = [];
   private userDetails: { [id: number]: UserDetails } = {};
 
