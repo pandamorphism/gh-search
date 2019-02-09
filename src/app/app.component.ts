@@ -5,10 +5,10 @@ import {catchError, debounceTime, finalize, switchMap, take, tap} from 'rxjs/ope
 import {separate} from 'rxjs-etc';
 import {isEmptyString} from './shared/misc/pure';
 import {untilDestroyed} from 'ngx-take-until-destroy';
-import {Subject, throwError} from 'rxjs';
+import {of, Subject, throwError} from 'rxjs';
 import {Rel, SearchResult, UrlToRel, UserDetails, UserInfo} from './shared/model/model';
 import {animate, style, transition, trigger} from '@angular/animations';
-import {MatIconRegistry} from '@angular/material';
+import {MatIconRegistry, MatSnackBar} from '@angular/material';
 import {DomSanitizer} from '@angular/platform-browser';
 
 @Component({
@@ -32,7 +32,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(private searchService: SearchService,
               private domSanitizer: DomSanitizer,
-              private matIconRegistry: MatIconRegistry) {
+              private matIconRegistry: MatIconRegistry,
+              private snackBar: MatSnackBar) {
     this.matIconRegistry.addSvgIcon(
       'github',
       this.domSanitizer.bypassSecurityTrustResourceUrl('../assets/gh.svg')
@@ -49,7 +50,17 @@ export class AppComponent implements OnInit, OnDestroy {
     ).subscribe();
 
     search$.pipe(
-      switchMap(term => this.searchService.search$(term)),
+      switchMap(term => this.searchService.search$(term).pipe(
+        catchError(err => {
+          this.snackBar.open(err.error.message, '', {
+            duration: 5000,
+            panelClass: 'error',
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+          return of(null);
+        })
+      )),
       tap(response => this.res$.next(response)),
       untilDestroyed(this)
     ).subscribe();
@@ -77,7 +88,12 @@ export class AppComponent implements OnInit, OnDestroy {
     this.searchService.getDetails$(item).pipe(
       tap(details => this.userDetails[item.id] = details),
       catchError(err => {
-        console.error(err);
+        this.snackBar.open(err.message, '', {
+          duration: 2000,
+          panelClass: 'error',
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
         return throwError(err);
       }),
       finalize(
